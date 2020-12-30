@@ -3,7 +3,7 @@ package com.imooc.jdbc.hrapp.command;
 import java.sql.*;
 import java.util.Scanner;
 
-public class QueryCommend implements Command {
+public class PstmtQueryCommend implements Command {
 
 
     @Override
@@ -14,7 +14,7 @@ public class QueryCommend implements Command {
         //键盘输入后得到的字符串
         String pdname = scannerIn.nextLine();
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet rs = null;
 
         try {//第一步：把想要连接的数据库驱动加载入JVM，如加载mysql数据库驱动类可以通过`Class.forName("com.mysql.cj.jdbc.Driver");`加载并注册JDBC驱动
@@ -26,10 +26,14 @@ public class QueryCommend implements Command {
                     "448866293"
             );
             //第三步：利用**上一步的数据库连接**创建Statement
-            statement = connection.createStatement();
+            String sql = "SELECT * FROM employee WHERE dname = ? and eno > ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, pdname);
+            preparedStatement.setInt(2, 3500);
+
             //结果集
-            System.out.println("SELECT * FROM employee WHERE dname = '" + pdname + "'");
-            rs = statement.executeQuery("SELECT * FROM employee WHERE dname = '" + pdname + "'");
+            rs = preparedStatement.executeQuery();
+
             //第四步：遍历查询结果
             while (rs.next()) {
                 Integer eno = rs.getInt(1);//表示把数据表的第一行提取出来
